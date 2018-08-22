@@ -18,9 +18,9 @@ class UserMapping {
     fun map(entry: SearchResultEntry?): User? {
         if (entry == null) return null
 
-        fun SearchResultEntry.str(attributeName: String) = getAttributeValue(attributeName)
-        fun SearchResultEntry.int(attributeName: String) = getAttributeValueAsInteger(attributeName)
-        fun SearchResultEntry.long(attributeName: String) = getAttributeValueAsLong(attributeName)
+        fun SearchResultEntry.str(attributeName: String) = getAttributeValue(attributeName) ?: ""
+        fun SearchResultEntry.int(attributeName: String) = getAttributeValueAsInteger(attributeName) ?: 0
+        fun SearchResultEntry.long(attributeName: String) = getAttributeValueAsLong(attributeName) ?: 0L
 
         return try {
             with(entry) {
@@ -44,17 +44,17 @@ class UserMapping {
                         mail = str("mail"),
                         szzStatus = User.State.fromString(str("szzStatus")),
                         szzMailStatus = User.State.fromString(str("szzMailStatus")),
-                        sambaPwdLastSet = long("sambaPwdLastSet") ?: 0L,
+                        sambaPwdLastSet = long("sambaPwdLastSet"),
                         szzEntryDate = parseDate(dn, str("szzEntryDate")),
                         szzExitDate = parseDate(dn, str("szzExitDate")),
                         ou = str("ou"),
                         description = str("description"),
-                        telephoneNumber = str("telephoneNumber") ?: "",
-                        mobile = str("mobile") ?: "",
+                        telephoneNumber = str("telephoneNumber"),
+                        mobile = str("mobile"),
                         employeeNumber = str("employeeNumber"),
-                        title = str("title") ?: "",
+                        title = str("title"),
                         l = str("l"),
-                        szzPublicKey = str("szzPublicKey") ?: "",
+                        szzPublicKey = str("szzPublicKey"),
                         o = companyForDn(dn).second,
                         companyKey = companyForDn(dn).first,
                         modifiersName = str("modifiersName"),
@@ -86,15 +86,6 @@ class UserMapping {
                         LOG.warn("Could not parse date [dn=$dn, date=$date]")
                     null
                 }
-            }
-
-    private fun parseDate(dn: String, required: Boolean, year: Int?, month: Int?, day: Int?): LocalDate? =
-            try {
-                LocalDate.of(year!!, month!!, day!!)
-            } catch (e: Exception) {
-                if (required)
-                    LOG.warn("Could not parse date [dn=$dn, required=$required, year=$year, month=$month, day=$day]")
-                null
             }
 
     companion object {
